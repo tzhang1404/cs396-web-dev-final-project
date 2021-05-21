@@ -1,0 +1,88 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    color: #545454;
+    display: flex;
+    font-family: sans-serif;
+    justify-content: center;
+}
+
+.main_container {
+    background: #7c34ba;
+    margin: 50px;
+    padding: 50px; 
+    border-radius: 25px;
+}
+
+.title {
+    text-align: center;
+    color: #FFFFFF
+}
+
+.title span {
+    color: #f0cd30;
+}
+
+#action-buttons-group {
+    display: flex;
+    cursor: pointer;
+    margin-top: 25px;
+    font-size: 25px;
+    color: #FFFFFF;
+    justify-content: space-around;
+}
+
+#easy:hover,
+#hard:hover,
+#reset:hover {
+    background: #c098e3;
+}
+
+
+#status-group {
+    display: flex;
+    margin-top: 20px;
+    font-size: 30px;
+    color: #FFFFFF;
+    justify-content: space-around;
+}
+
+
+#game-grid {
+    background: #451c69;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-gap: 15px;
+    margin-top: 15px;
+}
+
+.game-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #7c34ba;
+    color: #f3e3fa;
+    height: 150px;
+    width: 150px;
+    cursor: pointer;
+}
+
+.x::after {
+    content: 'X';
+    font-size: 150px;
+}
+
+
+.o::after {
+    content: 'O';
+    font-size: 150px;
+}
+
+.game-cell:hover {
+    background: #9944e3;
+}
