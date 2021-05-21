@@ -79,7 +79,7 @@ body {
 
 
 .o::after {
-    content: 'O';
+    content: '○';
     font-size: 150px;
 }
 
