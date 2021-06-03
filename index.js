@@ -1,7 +1,9 @@
 //global variable
 
-var DIFFICULTY = "EASY";
+var GAME_MODE = "SINGLE";
+var X_NAME = "Your"
 var X_NEXT = true;
+var GAME_STARTED = false;
 var GAME_WON = false; 
 var WINNER = "";
 
@@ -18,27 +20,41 @@ const create_grid_cells = () => {
     `;
 }
 
-const updateLevelText = () => {
+const updateGameModeText = () => {
     const highlightColor = "#f0cd30";
-    const easy = document.getElementById("easy");
-    const hard = document.getElementById("hard");
-    easy.style.color="#FFFFFF";
-    easy.style.fontWeight="normal";
-    hard.style.color="#FFFFFF";
-    hard.style.fontWeight="normal";    
-    if(DIFFICULTY==="EASY"){
-        easy.style.color=highlightColor
-        easy.style.fontWeight="bold";
+    const single_player = document.getElementById("single_player");
+    const two_players = document.getElementById("two_players");
+    single_player.style.color="#FFFFFF";
+    single_player.style.fontWeight="normal";
+    two_players.style.color="#FFFFFF";
+    two_players.style.fontWeight="normal";    
+    if(GAME_MODE==="SINGLE"){
+        single_player.style.color=highlightColor
+        single_player.style.fontWeight="bold";
     }
     else{
-        hard.style.color=highlightColor;
-        hard.style.fontWeight="bold";    
+        two_players.style.color=highlightColor;
+        two_players.style.fontWeight="bold";    
     }
 }
 
 
 const updateStatusText = () => {
     const status = document.getElementById("status");
+
+    var game_cells_list = document.querySelectorAll(".game-cell");
+    var vacant_cell = 0;
+    for(var i = 0; i < game_cells_list.length; i++){
+        var game_cell = game_cells_list[i];
+        if(!game_cell.classList.contains("o") && !game_cell.classList.contains("x")){
+            vacant_cell ++;
+        }
+    }
+    if(vacant_cell === 0 && !GAME_WON){
+        status.innerHTML = "Draw! Please Reset the Game.";
+        return;
+    }
+
     if(!GAME_WON)
         status.style.color = "#ffffff";
     else
@@ -49,7 +65,7 @@ const updateStatusText = () => {
     }
 
     if(X_NEXT){
-        status.innerHTML = "X's turn to move!";
+        status.innerHTML = `${X_NAME} turn to move!`;
     }
     else{
         status.innerHTML = "O's turn to move!";
@@ -92,19 +108,51 @@ const flash_winner_text = (index, is_row, is_col, diag_left) => {
 }
 
 
+const findTargetCellRandom = () => {
+    var possible_cells = [];
+    var game_cells_list = document.querySelectorAll(".game-cell");
+    for(var i = 0; i < game_cells_list.length; i++){
+        var game_cell = game_cells_list[i];
+        if(!game_cell.classList.contains("o") && !game_cell.classList.contains("x")){
+            possible_cells.push(game_cell);
+        }
+    }
+    if(possible_cells.length === 0) return;
+    var chosen_cell = possible_cells[Math.floor(Math.random() * possible_cells.length)];
+    return chosen_cell;
+}
+
+
+const computerMakeMove = () => {
+    if(GAME_WON) return;
+    var target_cell = findTargetCellRandom();
+    if(!target_cell){
+        return;
+    }
+    setTimeout(() => { 
+        target_cell.classList.add("o");
+        X_NEXT = !X_NEXT;
+        checkWinner();
+        updateStatusText();
+    }, 700);
+    // target_cell.classList.add("o"); 
+    
+}
+
+
 const attachListeners = () => {
     // const status = document.getElementById("status");
     const reset = document.getElementById("reset");
     const game_cells = document.querySelectorAll(".game-cell");
-    const easy_button = document.getElementById("easy");
-    const hard_button = document.getElementById("hard");
+    const single_player_button = document.getElementById("single_player");
+    const two_players_button = document.getElementById("two_players");
 
     game_cells.forEach(cell => {
         cell.addEventListener('click', handleCellClick);
     })
     reset.addEventListener('click', handleReset);
-    easy_button.addEventListener('click', handleDifficultyClick);
-    hard_button.addEventListener('click', handleDifficultyClick);
+    single_player_button.addEventListener('click', handleGameModeClick);
+    two_players_button.addEventListener('click', handleGameModeClick);
 }
 
 const checkWinner = () => {
@@ -217,6 +265,9 @@ const handleReset = (e) => {
 }
 
 const handleCellClick = (e) => {
+    if (!GAME_STARTED){
+        GAME_STARTED = true;
+    }
     if(GAME_WON){
         return; 
     }
@@ -237,17 +288,34 @@ const handleCellClick = (e) => {
     }
     checkWinner();
     updateStatusText();
+
+    if(GAME_MODE === "SINGLE" && !X_NEXT){
+        computerMakeMove();
+    }
+
 }
 
-const handleDifficultyClick = (e) => {
+
+const handleGameModeClick = (e) => {
+    if(GAME_STARTED){
+        if(confirm('Are you sure you want to reset the game?')){
+            resetGame();
+        }
+        else{
+            return;
+        }
+    }
     const id = e.target.id;
-    if(id === "easy"){
-        DIFFICULTY = "EASY";
+    if(id === "single_player"){
+        GAME_MODE = "SINGLE";
+        X_NAME = "Your"
     }
     else{
-        DIFFICULTY = "HARD";
+        GAME_MODE = "DOUBLE";
+        X_NAME = "X's";
     }
-    updateLevelText();
+    updateGameModeText();
+    updateStatusText();
 }
 
 
@@ -257,7 +325,7 @@ const resetGame = () => {
     GAME_WON = false;
     WINNER = "";
     create_grid_cells();
-    updateLevelText();
+    updateGameModeText();
     updateStatusText();
     attachListeners();
 }
