@@ -123,9 +123,128 @@ const findTargetCellRandom = () => {
 }
 
 
+const findTargetCellSmart = (side) => {
+    var possible_cell_index = [];
+    for(var i = 0; i < 9; i++){
+        // console.log("#cell_"+ i.toString());
+        var game_cell = document.querySelector("#cell_"+ i.toString());
+        if(!game_cell.classList.contains("o") && !game_cell.classList.contains("x")){
+            possible_cell_index.push(i);
+        }
+    }
+    var max_score = -100;
+    var best_index = -1;
+    possible_cell_index.forEach(index => {
+        const curr_score_own = assignCellScore(index, side);
+        const curr_score_oppo = assignCellScore(index, side === 'o' ? 'x' : 'o');
+        console.log(index, curr_score_own, curr_score_oppo, max_score);
+        if(curr_score_own > max_score){
+            max_score = curr_score_own;
+            best_index = index;
+        }
+        if(curr_score_oppo >= max_score){
+            max_score = curr_score_oppo;
+            best_index = index;
+        }
+    });
+    return document.querySelector("#cell_" + best_index.toString());
+}
+
+const calculateScore = (i, side) => {
+    const curr_cell = document.querySelector("#cell_"+ i.toString());
+    var opposite_side = side === "o" ? "x" : "o";
+    if(curr_cell.classList.contains(side)){
+        return 2;
+    }
+    else if(curr_cell.classList.contains(opposite_side)){
+        return -2;
+    }
+    else{
+        return 1;
+    }
+}
+
+const assignCellScore = (game_cell_index, side) => {
+    var i = game_cell_index;
+    var cell_score = 0;
+    var occupied_cnt = 0;
+    //check column above
+    while(i > 0){
+        i -= 3;
+        if(i < 0) break;
+        const score = calculateScore(i, side);
+        cell_score += score;
+        if(score == 2) occupied_cnt++;
+        if(score < 0){
+            break;
+        }
+    }
+    //check column below
+    i = game_cell_index;
+    while(i < 9){
+        i += 3;
+        if(i > 8) break;
+        const score = calculateScore(i, side);
+        cell_score += score;
+        if(score == 2) occupied_cnt++;
+        if(score < 0){
+            break;
+        }
+    }
+
+    if(occupied_cnt == 2){
+        //this column is about to win
+        cell_score = 100;
+        return cell_score;
+    }
+    else{
+        occupied_cnt = 0;
+    }
+
+    i = game_cell_index;
+    //check row right
+    for(var j = 0; j < 2; j++){
+        i++;
+        if(i === 3 || i === 6 || i === 9) break;
+        const score = calculateScore(i, side);
+        cell_score += score;
+        if(score == 2) occupied_cnt++;
+        if(score < 0){
+            break;
+        }
+    }
+
+    i = game_cell_index;
+    //check row left
+    for(var j = 0; j < 2; j++){
+        i--;
+        if(i === 5 || i === 2 || i === -1) break;
+        const score = calculateScore(i, side);
+        cell_score += score;
+        if(score == 2) occupied_cnt++;
+        if(score < 0){
+            break;
+        }
+    }
+
+    if(occupied_cnt == 2){
+        //this column is about to win
+        cell_score = 100;
+        return cell_score;
+    }
+    else{
+        occupied_cnt = 0;
+    }
+
+    return cell_score;
+    
+}
+
+
 const computerMakeMove = () => {
     if(GAME_WON) return;
-    var target_cell = findTargetCellRandom();
+    // var target_cell = findTargetCellRandom();
+    var target_cell = findTargetCellSmart("o");
     if(!target_cell){
         return;
     }
@@ -135,7 +254,6 @@ const computerMakeMove = () => {
         checkWinner();
         updateStatusText();
     }, 700);
-    // target_cell.classList.add("o"); 
     
 }
 
