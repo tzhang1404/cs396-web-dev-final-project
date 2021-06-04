@@ -137,7 +137,7 @@ const findTargetCellSmart = (side) => {
     possible_cell_index.forEach(index => {
         const curr_score_own = assignCellScore(index, side);
         const curr_score_oppo = assignCellScore(index, side === 'o' ? 'x' : 'o');
-        console.log(index, curr_score_own, curr_score_oppo, max_score);
+        // console.log(index, curr_score_own, curr_score_oppo, max_score);
         if(curr_score_own > max_score){
             max_score = curr_score_own;
             best_index = index;
@@ -389,7 +389,7 @@ const handleCellClick = (e) => {
     if(GAME_WON){
         return; 
     }
-    console.log(`${e.target.id} clicked`);
+    // console.log(`${e.target.id} clicked`);
     const classList = e.target.classList;
     
     if(classList.length !== 1){
